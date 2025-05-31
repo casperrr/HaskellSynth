@@ -18,6 +18,7 @@ type ADSR = (Seconds, Seconds, Level, Seconds)
 type Beats = Float
 type Note = [Pulse]
 type Song = [Pulse]
+type WaveForm = Float -> Float
 
 ----------- Vairables -------------
 
@@ -65,20 +66,34 @@ rampRange t n m = map ((+n).(*(m-n))) $ ramp t
 --------------- Note Generation ------------------
 
 note :: Semitones -> Beats -> Note
-note n b = freq (pitch n) $ b*beatDuration
+note n b = wave (pitch n) $ b*beatDuration
 
 rest :: Beats -> Note
 rest b = replicate (floor $ sampleRate*b*beatDuration+1) 0.0
 
-freq :: Hz -> Seconds -> [Pulse]
-freq hz duration = adsr testADSR $ map ((*volume) . sin . (*step)) [0.0 .. sampleRate * duration]
+wave :: Hz -> Seconds -> [Pulse]
+wave hz duration = adsr testADSR $ map ((*volume) . squareWave . (*step)) [0.0 .. sampleRate * duration]
   where
     step = (hz*2*pi)/sampleRate
+
+-- wave' :: Hz -> Seconds -> WaveForm -> [Pulse]
+-- wave' hz d wf = map ((*volume) . wf . step) [0.0 .. sampleRate*d]
+--   where step = (*((hz*2*pi)/sampleRate))
 
 pitch :: Semitones -> Hz
 pitch n = pitchStd*(2**(1.0/12.0))**n
 
+squareWaveRec :: Float -> WaveForm
+squareWaveRec 0 x = sin x
+squareWaveRec n x = ((1/(n*2+1))*sin(x*(n*2+1))) + squareWaveRec (n-1) x
+
+squareWave :: WaveForm
+squareWave x = if sin x >= 0 then 1 else -1
+
+
 --------------- Songs --------------------
+
+-- Edit this so its a list of notes that u can map over and stuff
 
 aMajorScale :: Song
 aMajorScale = concat [note i 1.0 | i <- concat (replicate 3 [0, 2, 4, 5, 7, 9, 11, 12])]
@@ -90,7 +105,6 @@ infixr 5 >*
 (|>) = mappend
 infixr 4 |>
 
--- .. .. - .. | .. .. - .. .. .. - | 
 song1 :: Song
 song1 = ssp1 |> 8 >* ssp2
 
