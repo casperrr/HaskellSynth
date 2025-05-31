@@ -5,6 +5,8 @@ import System.Process
 import Text.Printf
 import Data.List (sort)
 
+----------- Types -----------------
+
 type Pulse = Float
 type Level = Float
 type Seconds = Float
@@ -40,6 +42,8 @@ timeSig = (4,4)
 beatDuration :: Seconds
 beatDuration = 60.0/bpm
 
+--------------- Envolope Generation -----------------
+
 adsr :: ADSR -> [Pulse] -> [Pulse]
 adsr (a, d, s, r) n = applyEnd (ramp r ++ sus 1.0) $ apply ads n 
   where
@@ -58,6 +62,8 @@ ramp t = [i / (sampleRate*t) | i <- [0.0..sampleRate*t]]
 rampRange :: Seconds -> Float -> Float -> [Pulse]
 rampRange t n m = map ((+n).(*(m-n))) $ ramp t
 
+--------------- Note Generation ------------------
+
 note :: Semitones -> Beats -> Note
 note n b = freq (pitch n) $ b*beatDuration
 
@@ -71,6 +77,8 @@ freq hz duration = adsr testADSR $ map ((*volume) . sin . (*step)) [0.0 .. sampl
 
 pitch :: Semitones -> Hz
 pitch n = pitchStd*(2**(1.0/12.0))**n
+
+--------------- Songs --------------------
 
 aMajorScale :: Song
 aMajorScale = concat [note i 1.0 | i <- concat (replicate 3 [0, 2, 4, 5, 7, 9, 11, 12])]
@@ -104,6 +112,8 @@ ssp2 =
     s1 n = 4 >* note n 0.25 |> note n 0.5 -- 1.5  .... -
     s2 n = s1 n |> (2 >* note n 0.25) -- 2  .... - ..
     s3 n = 2>*note n 0.25 -- 0.5
+
+------------- Util ---------------- 
 
 save :: FilePath -> Song -> IO ()
 save filePath song = BSL.writeFile filePath $ B.toLazyByteString $ foldMap B.floatLE song
