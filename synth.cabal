@@ -5,13 +5,10 @@ author:             casperrr
 category:           Sound
 build-type:         Simple
 
-common warnings
-    ghc-options: -Wall
-
 executable synth
-    import:           warnings
     main-is:          Main.hs
-    -- other-modules:
+    other-modules:    Synth
+                      Synth.Types
     build-depends:    base ^>=4.18.3.0
     hs-source-dirs:   .
     default-language: Haskell2010
