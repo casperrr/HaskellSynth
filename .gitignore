@@ -1,1 +1,7 @@
 *.bin
+dist-newstyle/
+.ghc.environment.*
+*.hi
+*.o
+dist/
+cabal.project.local
