@@ -20,6 +20,7 @@ wave hz duration = map (sin . (*step)) [0.0 .. sampleRate * duration]
     where
         step = (hz*2*pi)/sampleRate
 
+-- Maybe move this to another module with other effects like limiter and stuff
 volume :: Float -> Wave -> Wave
 volume v = map (*v)
 
