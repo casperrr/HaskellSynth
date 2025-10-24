@@ -1,4 +1,5 @@
 *.bin
+*.wav
 dist-newstyle/
 .ghc.environment.*
 *.hi
