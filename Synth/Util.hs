@@ -23,14 +23,7 @@ playRaw audio = do
     _ <- runCommand $ printf "ffplay -showmode 1 -f f32le -ar %f %s" sampleRate "output.bin"
     return ()
 
--- Trying to write wav files
-
--- saveWav :: FilePath -> Audio -> IO ()
-
--- In order to use wav file, its convinient to use 16-Bit PCM instead of 32-Bit Float.
--- To do this i need to:
--- clip values to [-1.0, 1.0]
--- Scale to Int-16 range [-32768, 32767]
+------ WAV File Creation ------
 
 clamp :: Sample -> Sample
 clamp x = max (-1.0) (min 1.0 x)
